@@ -1,11 +1,75 @@
 const api_base = 'https://openapi.programming-hero.com/api/phero-tube'
 
 let currentVideos = []
+
+const createVideoCard = (categoryVideo, index) => {
+ const card = document.createElement('div')
+  card.className = "card-hover bg-[#151520] border border-[#2a2a3e] rounded-2xl overflow-hidden animate-fade-in-up"
+  card.style.animationDelay = `${index * 0.1}s`
+  card.innerHTML = ` 
+   <div class="relative h-52 bg-[#0a0a0f] overflow-hidden">
+    <img
+      
+      loading="lazy"
+      class="w-full h-full object-cover img-scale"
+    />
+    <span class="absolute bottom-3 right-3 px-3 py-1.5 bg-black/85 backdrop-blur-sm text-white text-xs font-semibold rounded-lg">
+    
+      </span>
+  </div>
+
+  <div class="p-4">
+    <h3 class="text-base font-semibold text-white mb-3 line-clamp-2 leading-snug">
+     
+    </h3>
+
+    <div class="flex items-center gap-3 mb-2">
+      <img
+        class="w-9 h-9 rounded-full border-2 border-[#ff1f3d]"
+        
+      />
+      <div class="flex items-center gap-2 flex-wrap text-sm text-gray-400">
+       
+      
+      }
+      </div>
+    </div>
+
+    
+
+    <button
+      
+      class="w-full px-4 py-2.5 bg-transparent border border-[#2a2a3e] text-gray-300 font-medium rounded-lg hover:bg-[#ff1f3d] hover:border-[#ff1f3d] hover:text-white transition-all duration-300"
+    >
+      View Details
+    </button>
+  </div>
+    `;
+   return card
+}
+
 const displayVideos = (categoryVideos) => {
- const videoContainer = document.getElementById('video-container')
+  // console.log(categoryVideos)
+  const videoContainer = document.getElementById('video-container')
   videoContainer.innerHTML = ''
   currentVideos = categoryVideos || []   //dry => dont repeat yourself
   // console.log(currentVideos)
+  if (!categoryVideos || categoryVideos.length === 0) {
+    videoContainer.innerHTML = ` 
+      <div class="col-span-full flex flex-col items-center justify-center py-20 text-center">
+        <img src="Icon.png" alt="No content" class="w-32 opacity-50 mb-6" />
+        <h2 class="text-2xl md:text-3xl font-bold text-white mb-3">No Content Found</h2>
+        <p class="text-gray-400 text-lg">Try searching for something else or browse different categories</p>
+      </div>`
+    return
+  }
+
+  categoryVideos.forEach((categoryVideo, index) => {
+     const videoCard = createVideoCard(categoryVideo, index)
+    videoContainer.appendChild(videoCard)
+    // console.log(categoryVideo)
+  })
+
 }
 const loadCategoryVideos = async (categoryId) => {
   try {
@@ -19,9 +83,6 @@ const loadCategoryVideos = async (categoryId) => {
     console.error('error loading categories', err)
   }
 }
-
-
-  
 
 const displayCategories = (categories = []) => {
  const categoryContainer = document.getElementById('category-container')
