@@ -12,11 +12,54 @@ const hideLoader = () => {
   document.getElementById('video-container').classList.remove('hidden')
 }
 
+const formatTimeAgo = seconds => {
+  if (!seconds) return 'recently uploaded'
+  const hours = Math.floor(seconds / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  if (hours > 24) {
+    const days = Math.floor(hours / 24)
+    return `${days}day${days > 1 ? 's' : ''}ago`
+  }
+  if (hours > 0) {
+    return `${hours}hr ${hours > 1 ? 's' : ''} ${minutes}min ago`
+  }
+}
+
+const formatViews = views => {
+  // console.log(views)
+  const number = parseInt(views)
+  console.log(number)
+  if (number >= 1000000) {
+    return `${(number / 1000000).toFixed(1)}M views`
+  }
+  if (number >= 1000) {
+    return `${(number / 1000).toFixed(1)}K views`
+  }
+ return `${number} views`
+}
+
+const showDetailModal = async () => {
+  console.log('ok')
+  // try {
+  //   const response = await fetch(`${api_base}/video/${videoId}`)
+  //   const data = await response.json()
+  //   console.log(data)
+  //   // const {video} = data
+  //   console.log(data.video)
+  // }
+  // catch (e) {
+  //   console.log(e)
+  // }
+}
+
+
 const createVideoCard = (categoryVideo, index) => {
-  console.log(categoryVideo)
+  // console.log(categoryVideo)
   const card = document.createElement('div')
   card.className = "card-hover bg-[#151520] border border-[#2a2a3e] rounded-2xl overflow-hidden animate-fade-in-up"
   card.style.animationDelay = `${index * 0.1}s`
+  const timeAgo = formatTimeAgo(categoryVideo?.others?.posted_date)
+  const views = formatViews(categoryVideo?.others?.views)
   card.innerHTML = ` 
   <div class="relative h-52 bg-[#0a0a0f] overflow-hidden">
       <img 
@@ -25,6 +68,9 @@ const createVideoCard = (categoryVideo, index) => {
         loading="lazy"
         class="w-full h-full object-cover img-scale"
       />
+      <span class="absolute bottom-3 right-3 px-3 py-1.5 bg-black/85 backdrop-blur-sm text-white text-xs font-semibold rounded-lg">
+        ${timeAgo}
+      </span>
      
     </div>
 
@@ -44,8 +90,9 @@ const createVideoCard = (categoryVideo, index) => {
   
         </div>
       </div>
-
-      <button 
+      <p class="text-sm text-gray-400 mb-4">${views}</p>
+     <button 
+        onclick="showDetailModal()"
         class="w-full px-4 py-2.5 bg-transparent border border-[#2a2a3e] text-gray-300 font-medium rounded-lg hover:bg-[#ff1f3d] hover:border-[#ff1f3d] hover:text-white transition-all duration-300"
       >
         View Details
