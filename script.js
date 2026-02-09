@@ -38,18 +38,15 @@ const formatViews = views => {
  return `${number} views`
 }
 
-const showDetailModal = async () => {
-  console.log('ok')
-  // try {
-  //   const response = await fetch(`${api_base}/video/${videoId}`)
-  //   const data = await response.json()
-  //   console.log(data)
-  //   // const {video} = data
-  //   console.log(data.video)
-  // }
-  // catch (e) {
-  //   console.log(e)
-  // }
+ window.showDetailModal = async (videoId) => {
+  try {
+    const response = await fetch(`${api_base}/video/${videoId}`)
+    const data = await response.json()
+    console.log(data)
+  }
+  catch (e) {
+    console.log(e)
+  }
 }
 
 
@@ -92,7 +89,7 @@ const createVideoCard = (categoryVideo, index) => {
       </div>
       <p class="text-sm text-gray-400 mb-4">${views}</p>
      <button 
-        onclick="showDetailModal()"
+        onclick="showDetailModal('${categoryVideo.video_id}')"
         class="w-full px-4 py-2.5 bg-transparent border border-[#2a2a3e] text-gray-300 font-medium rounded-lg hover:bg-[#ff1f3d] hover:border-[#ff1f3d] hover:text-white transition-all duration-300"
       >
         View Details
