@@ -28,7 +28,7 @@ const formatTimeAgo = seconds => {
 const formatViews = views => {
   // console.log(views)
   const number = parseInt(views)
-  console.log(number)
+  // console.log(number)
   if (number >= 1000000) {
     return `${(number / 1000000).toFixed(1)}M views`
   }
@@ -42,7 +42,40 @@ const formatViews = views => {
   try {
     const response = await fetch(`${api_base}/video/${videoId}`)
     const data = await response.json()
-    console.log(data)
+    const {video} = data
+    const modalContainer = document.getElementById('modal-container')
+    modalContainer.innerHTML = `
+    <dialog id="details_modal" class="modal backdrop-blur-sm">
+        <div class="modal-box bg-[#151520] border border-[#2a2a3e] rounded-2xl max-w-2xl">
+          <h3 class="text-2xl font-bold text-white mb-4">
+            ${video.title || "Video Details"}
+          </h3>
+          
+          <img 
+            class="w-full max-w-md rounded-xl mb-4 mx-auto" 
+            src="${video.thumbnail}" 
+            alt="${video.title || "Video thumbnail"}"
+          />
+          
+          <p class="text-gray-300 leading-relaxed mb-6">
+            ${video.description || "No description available."}
+          </p>
+          
+          <div class="modal-action">
+            <form method="dialog">
+              <button class="px-6 py-2.5 bg-[#ff1f3d] text-white font-semibold rounded-lg hover:bg-[#d91932] transition-all duration-300">
+                Close
+              </button>
+            </form>
+          </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
+    `
+    document.getElementById('details_modal').showModal()
+    // console.log(data)
   }
   catch (e) {
     console.log(e)
@@ -168,8 +201,71 @@ const loadCategories = async () => {
     console.error('error loading categories', err)
   }
 }
+
+const removeActiveClass = () => {
+  const activeBtns = document.querySelectorAll(".category-btn-active");
+  console.log(activeBtns)
+  activeBtns.forEach((btn) => {
+    console.log(btn)
+    btn.classList.remove(
+      "bg-gradient-primary",
+      "shadow-md",
+      "shadow-[#ff1f3d]/30",
+      "category-btn-active"
+    );
+    btn.classList.add("bg-[#151520]", "border", "border-[#2a2a3e]", "text-gray-300");
+  });
+}
+
+window.loadVideos = async (searchText = '') => {
+  showLoader()
+ try {
+   const response = await fetch(`${api_base}/videos?title=${searchText}`)
+   const data = await response.json()
+   removeActiveClass()
+   const {videos} = data
+   const allButton = document.getElementById('btn-all')
+   if (allButton){
+     allButton.classList.remove("bg-[#151520]", "border", "border-[#2a2a3e]", "text-gray-300");
+     allButton.classList.add(
+       "bg-gradient-primary",
+       "shadow-md",
+       "shadow-[#ff1f3d]/30",
+       "category-btn-active"
+     );
+   }
+   displayVideos(videos)
+   // console.log(videos)
+ }
+ catch (e) {
+   console.error(e)
+ }
+ finally {
+   hideLoader()
+ }
+}
+
+const setupSearch = () => {
+ const searchInput = document.getElementById('searchInput')
+  let searchTimeOut
+  searchInput.addEventListener('input', e => {
+  searchTimeOut = setTimeout(() => {
+    const searchText = e.target.value.trim()
+    loadVideos(searchText)
+  }, 500)
+    clearTimeout(searchTimeOut)
+  })
+}
+
 const initialApp = async () => {
- await loadCategories()
+ try {
+   setupSearch()
+   await loadCategories()
+   await loadVideos()
+ }
+ catch (e) {
+   console.error(e)
+ }
 }
 
 initialApp()
