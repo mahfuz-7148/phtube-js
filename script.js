@@ -281,6 +281,7 @@ window.sortVideosByViews = () => {
    const viewsB = parseInt(b.others?.views || 0)
    return viewsB - viewsA
  })
+
   displayVideos(sortVideos)
   const message = isSortByViews ?
     'sorted highest' : 'showing original'
