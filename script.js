@@ -1,6 +1,7 @@
 const api_base = 'https://openapi.programming-hero.com/api/phero-tube'
 
 let currentVideos = []
+let isSortByViews = false
 
 const showLoader = () => {
  document.getElementById('loader').classList.remove('hidden')
@@ -161,6 +162,18 @@ const loadCategoryVideos = async (categoryId) => {
     const response = await fetch(`${api_base}/category/${categoryId}`)
     const data = await response.json()
     const {category} = data
+    removeActiveClass()
+    const clickedButton = document.getElementById(`btn-${categoryId}`)
+    // console.log(clickedButton)
+    if (clickedButton) {
+      clickedButton.classList.remove("bg-[#151520]", "border", "border-[#2a2a3e]", "text-gray-300");
+      clickedButton.classList.add(
+        "bg-gradient-primary",
+        "shadow-md",
+        "shadow-[#ff1f3d]/30",
+        "category-btn-active"
+      );
+    }
     displayVideos(category)
     // console.log(category)
   }
@@ -204,9 +217,9 @@ const loadCategories = async () => {
 
 const removeActiveClass = () => {
   const activeBtns = document.querySelectorAll(".category-btn-active");
-  console.log(activeBtns)
+  // console.log(activeBtns)
   activeBtns.forEach((btn) => {
-    console.log(btn)
+    // console.log(btn)
     btn.classList.remove(
       "bg-gradient-primary",
       "shadow-md",
@@ -222,17 +235,20 @@ window.loadVideos = async (searchText = '') => {
  try {
    const response = await fetch(`${api_base}/videos?title=${searchText}`)
    const data = await response.json()
-   removeActiveClass()
    const {videos} = data
-   const allButton = document.getElementById('btn-all')
-   if (allButton){
-     allButton.classList.remove("bg-[#151520]", "border", "border-[#2a2a3e]", "text-gray-300");
-     allButton.classList.add(
-       "bg-gradient-primary",
-       "shadow-md",
-       "shadow-[#ff1f3d]/30",
-       "category-btn-active"
-     );
+   removeActiveClass();
+
+   if (searchText === '') {
+     const allButton = document.getElementById('btn-all')
+     if (allButton){
+       allButton.classList.remove("bg-[#151520]", "border", "border-[#2a2a3e]", "text-gray-300");
+       allButton.classList.add(
+         "bg-gradient-primary",
+         "shadow-md",
+         "shadow-[#ff1f3d]/30",
+         "category-btn-active"
+       );
+     }
    }
    displayVideos(videos)
    // console.log(videos)
@@ -249,12 +265,26 @@ const setupSearch = () => {
  const searchInput = document.getElementById('searchInput')
   let searchTimeOut
   searchInput.addEventListener('input', e => {
+    clearTimeout(searchTimeOut)
   searchTimeOut = setTimeout(() => {
     const searchText = e.target.value.trim()
     loadVideos(searchText)
   }, 500)
-    clearTimeout(searchTimeOut)
   })
+}
+
+window.sortVideosByViews = () => {
+  isSortByViews = !isSortByViews
+  // console.log(isSortByViews)
+  const sortVideos = [...currentVideos].sort((a, b) => {
+   const viewsA = parseInt(a.others?.views || 0)
+   const viewsB = parseInt(b.others?.views || 0)
+   return viewsB - viewsA
+ })
+  displayVideos(sortVideos)
+  const message = isSortByViews ?
+    'sorted highest' : 'showing original'
+  // alert(message)
 }
 
 const initialApp = async () => {
